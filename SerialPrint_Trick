@@ -1,0 +1,23 @@
+
+int pushButton = 2;
+
+void setup() {
+  // initialize serial communication at 115200 bits per second:
+  Serial.begin(115200);
+}
+
+// the loop routine runs over and over again forever:
+void loop() {
+  // Normal Serial Print
+  Serial.print("Hello ");
+  Serial.print(pushButton);
+  Serial.print("\t");
+  Serial.print("Hello2 ");
+  Serial.println(pushButton*2);
+
+  // Serial print in 1 line
+  Serial.println("Hello "+String(pushButton) + "\t" + "Hello2 " + String(pushButton*2));
+  Serial.println("-------------------------------------------------");
+  
+  delay(1);  // delay in between reads for stability
+}
