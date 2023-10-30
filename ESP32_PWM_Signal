@@ -1,5 +1,6 @@
 // the number of the LED pin
-const int ledPin = 2;  // 16 corresponds to GPIO16
+// Please go to https://randomnerdtutorials.com/esp32-pwm-arduino-ide/
+const int ledPin = 2;  // 
 
 // setting PWM properties
 const int freq = 1000;
@@ -21,3 +22,4 @@ void loop(){
     ledcWrite(ledChannel, dutyCycle);
     delay(15);
   }
+
