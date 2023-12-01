@@ -1,0 +1,72 @@
+#include <Wire.h>
+
+#define MPU6050_I2C_ADDRESS 0x68
+
+// Full-scale range configuration
+#define ACCEL_FULL_SCALE_RANGE 2  // Choose from 2, 4, 8, or 16 (in g)
+
+// Sensitivity factor based on the chosen full-scale range
+float accelSensitivity;
+
+void setup() {
+    Serial.begin(115200);
+    Wire.begin();
+    // Set the accelerometer full-scale range
+    configureAccelerometer();
+}
+
+void loop() {
+    // Request data from MPU6050
+    Wire.beginTransmission(MPU6050_I2C_ADDRESS);
+    Wire.write(0x3B);  // Starting register for accelerometer data
+    Wire.endTransmission(false);
+
+    Wire.requestFrom(MPU6050_I2C_ADDR, 6, 1);
+    // Read accelerometer data
+    int16_t accelX = Wire.read() << 8 | Wire.read();
+    int16_t accelY = Wire.read() << 8 | Wire.read();
+    int16_t accelZ = Wire.read() << 8 | Wire.read();
+
+    // Scale the accelerometer values based on sensitivity
+    // the unit of scaledAccelX is "g"
+    float scaledAccelX = accelX * accelSensitivity;
+    float scaledAccelY = accelY * accelSensitivity;
+    float scaledAccelZ = accelZ * accelSensitivity;
+
+    // Print or process the scaled data as needed
+    Serial.print("Scaled Accel X: "); Serial.println(scaledAccelX);
+    Serial.print("Scaled Accel Y: "); Serial.println(scaledAccelY);
+    Serial.print("Scaled Accel Z: "); Serial.println(scaledAccelZ);
+
+    delay(1000);  // Adjust as needed
+}
+
+void configureAccelerometer() {
+    // Configure accelerometer full-scale range
+    Wire.beginTransmission(MPU6050_I2C_ADDRESS);
+    Wire.write(0x1C);  // Register for accelerometer configuration
+    Wire.write((ACCEL_FULL_SCALE_RANGE << 3) | 0x00);  // Set the full-scale range
+    Wire.endTransmission(true);
+
+    // Set the sensitivity factor based on the chosen range
+    switch (ACCEL_FULL_SCALE_RANGE) {
+    // for +-2g, the resolotion is 4g/16bit because the range is -2g to +2g and all datapoint is 16 bit.
+    // Let say it 2g/15bit for 0g to +2g. That is the accelSensitivity 
+        case 2:
+            accelSensitivity = 2.0 / 32768.0;
+            break;
+        case 4:
+            accelSensitivity = 4.0 / 32768.0;
+            break;
+        case 8:
+            accelSensitivity = 8.0 / 32768.0;
+            break;
+        case 16:
+            accelSensitivity = 16.0 / 32768.0;
+            break;
+        default:
+            // Default to ±2g if an invalid range is selected
+            accelSensitivity = 2.0 / 32768.0;
+            break;
+    }
+}
