@@ -1,0 +1,34 @@
+//This code created by chat GPT by asking the code for mpu6050 with esp32 and wire.h library
+//Add some comment for studying
+//Read register map of mpu6050 at https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-6000-Register-Map1.pdf
+#include <Wire.h>
+//I2c address of MPU6050
+#define MPU6050_I2C_ADDRESS 0x68
+
+void setup() {
+    Serial.begin(115200);
+    Wire.begin();
+    // Additional setup code if needed
+}
+
+void loop() {
+    // Request data from MPU6050
+    Wire.beginTransmission(MPU6050_I2C_ADDRESS);
+    Wire.write(0x3B);  // Starting register for accelerometer data 
+    Wire.endTransmission(false);
+
+    //Ask the mpu6050 to sent accelerometer data by 6 bytes and stop. Then stored in Wire object
+    Wire.requestFrom(MPU6050_I2C_ADDRESS, 6, 1);  // Request 6 bytes (accelerometer data)
+
+    // Read accelerometer data
+    int16_t accelX = Wire.read() << 8 | Wire.read();
+    int16_t accelY = Wire.read() << 8 | Wire.read();
+    int16_t accelZ = Wire.read() << 8 | Wire.read();
+
+    // Print or process the data as needed
+    Serial.print("Accel X: "); Serial.println(accelX);
+    Serial.print("Accel Y: "); Serial.println(accelY);
+    Serial.print("Accel Z: "); Serial.println(accelZ);
+
+    delay(1000);  // Adjust as needed
+}
