@@ -1,0 +1,109 @@
+//Serial Part
+import processing.serial.*;
+Serial myPort; // Create a Serial object
+String incomingData;
+String[] endPointRaw = {"","",""};
+
+
+// Graphic Part
+//Control the length of axis. The axis will be larger for Scale=1
+float line_Scale = 0.8;
+int Max_Range = 20;
+int Main_Scale = Max_Range/4;
+
+//Create the end point for line according to scale 10 (another point is origin). This is default endPoint
+float[] endPoint = {-5,10,-10};
+
+void setup() {
+  
+  size(600, 600, P3D);
+  //Serial Part
+  String portName = "COM6"; // Change this to your Arduino's port
+  myPort = new Serial(this, portName, 115200);
+}
+
+void draw() {
+  background(255);  
+  //Serial Part
+  while (myPort.available() > 0) {
+    incomingData = myPort.readStringUntil('\n');
+    endPointRaw = split(incomingData, ' ');
+  }
+  //Data Part
+  endPoint[0] = float(endPointRaw[0]);
+  endPoint[1] = float(endPointRaw[1]);
+  endPoint[2] = float(endPointRaw[2]);
+  //In processing, we need to convert the position in our unit into Canvas unit
+  float endPointX = map(endPoint[0], -Max_Range, Max_Range, -width*line_Scale / 2, width*line_Scale / 2);
+  float endPointY = map(endPoint[1], -Max_Range, Max_Range, -width*line_Scale / 2, width*line_Scale / 2);
+  float endPointZ = map(endPoint[2], -Max_Range, Max_Range, -width*line_Scale / 2, width*line_Scale / 2);
+  
+  // Graphic Part
+  // Move the origin to the center of the canvas
+  translate(width / 2, height / 2, 10);
+  rotateX(radians(45));
+  rotateZ(radians(45));
+  
+  // Draw axes
+  drawAxes();
+
+  // draw Line
+  stroke(0); // Set stroke color to black
+  line(0, 0, 0,endPointX,endPointY,endPointZ);
+  
+ 
+
+}
+
+void drawAxes() {
+  // X-axis
+  stroke(255, 0, 0); // Red color
+  line(-width*line_Scale / 2, 0, 0, width*line_Scale / 2, 0, 0);
+  drawScaleX();
+
+  // Y-axis
+  stroke(0, 255, 0); // Green color
+  line(0, -height*line_Scale / 2, 0, 0, height*line_Scale / 2, 0);
+  drawScaleY();
+
+  // Z-axis
+  stroke(0, 0, 255); // Blue color
+  line(0, 0, -width*line_Scale / 2, 0, 0, width*line_Scale / 2);
+  drawScaleZ();
+}
+
+void drawScaleX() {
+  for (int i = -Max_Range; i <= Max_Range; i=i+Main_Scale) {
+    float tickX = map(i, -Max_Range, Max_Range, -width*line_Scale / 2, width*line_Scale / 2);
+    line(tickX, -5, 0, tickX, 5, 0);
+    textAlign(CENTER, CENTER);
+    fill(255, 0, 0); // Red color
+    text(i, tickX, 15, 0);
+  }
+}
+
+void drawScaleY() {
+  for (int i = -Max_Range; i <= Max_Range; i=i+Main_Scale) {
+    float tickY = map(i, -Max_Range, Max_Range, -height*line_Scale / 2, height*line_Scale / 2);
+    line(-5, tickY, 0, 5, tickY, 0);
+    textAlign(RIGHT, CENTER);
+    fill(255, 0, 0); // Red color
+    text(i, -15, tickY, 0);
+  }
+}
+
+void drawScaleZ() {
+  for (int i = -Max_Range; i <= Max_Range; i=i+Main_Scale) {
+    float tickZ = map(i, -Max_Range, Max_Range, -width*line_Scale / 2, width*line_Scale / 2);
+    line(0, -5, tickZ, 0, 5, tickZ);
+    textAlign(CENTER, TOP);
+    fill(255, 0, 0); // Red color
+    text(i, 0, 15, tickZ);
+  }
+}
+
+void drawArrow(float x, float y, float z) {
+  // Arrow shaft
+  stroke(2);
+  line(0, 0, 0, x, y, z);
+}
