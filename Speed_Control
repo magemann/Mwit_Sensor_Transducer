@@ -1,0 +1,20 @@
+int MotorA1 = 27;
+int MotorA2 = 26;
+int PWMA = 14;
+
+void setup() {
+  pinMode(MotorA1, OUTPUT);
+  pinMode(MotorA2, OUTPUT);
+  pinMode(PWMA, OUTPUT);
+  Serial.begin(9600);
+}
+void loop() {
+  digitalWrite(MotorA1, HIGH);
+  digitalWrite(MotorA2, LOW);
+  for (int x = 0; x < 255; x++) {
+    analogWrite(PWMA, x);
+    delay(10);
+    Serial.println(x);
+  }
+  delay(2000);
+}
